@@ -12,7 +12,9 @@ import { Server } from "socket.io";
 import messageRouter from "./routes/chat.js";
 import socket from "./services/socket.js";
 const requireAuth = passport.authenticate("jwt", { session: false });
-
+import uploadRouter from "./routes/upload.js";
+import communityRouter from "./routes/community.js";
+import postRouter from "./routes/post.js";
 passportServices(passport);
 const app = express();
 const server = createServer(app);
@@ -25,6 +27,9 @@ app.use("/user", userRouter);
 app.use(requireAuth);
 app.use("/room", roomRouter);
 app.use("/chat", messageRouter);
+app.use("/upload", uploadRouter);
+app.use("/community", communityRouter);
+app.use("/post", postRouter);
 
 socket(io);
 mongoose

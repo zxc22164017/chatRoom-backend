@@ -4,9 +4,13 @@ import Message from "../models/message.js";
 const messageRouter = Router();
 
 messageRouter.get("/:_id", async (req, res) => {
+  const limit = 10;
   const roomId = req.params._id;
+  const { page } = req.query;
+
   const findResults = await Message.find({ room: roomId })
-    .limit(20)
+    .limit(limit)
+    .skip(page * limit)
     .populate({ path: "sender", select: "username thumbnail" })
     .sort({ _id: -1 })
     .lean();

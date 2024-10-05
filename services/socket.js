@@ -44,13 +44,13 @@ export default function socket(io) {
       try {
         const sender = socket.request.user._id;
         console.log("send");
-        const newMessage = await new Message({
+        const newMessageWithoutSender = await new Message({
           room: roomId,
           message: message,
           sender: sender,
           createTime: Date.now(),
         }).save();
-        const newMessageP = await newMessage.populate({
+        const newMessage = await newMessageWithoutSender.populate({
           path: "sender",
           select: "username thumbnail",
         });
@@ -61,16 +61,19 @@ export default function socket(io) {
         if (!updatedRoom) {
           callback({ status: 400, message: "room doesn't exist" });
         } else {
-          socket.to(roomId).emit("recieveMessage", newMessageP);
-          callback({ status: 200, newMessageP });
+          socket.to(roomId).emit("recieveMessage", newMessage);
+          callback({ status: 200, newMessage });
         }
       } catch (error) {
-        callback("sendMessage", { message: "error", error: error });
+        callback({ status: 500, error: error });
       }
     });
 
-    socket.on("disconnect", () => {
-      console.log("a user disconnected");
+    socket.on("disconnect", async () => {
+      const userId = socket.request.user._id;
+      User.findByIdAndUpdate(userId, { isOnline: false });
+
+      console.log(`${socket.request.user.username} disconnected`);
     });
   });
 }

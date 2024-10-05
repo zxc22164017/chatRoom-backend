@@ -9,7 +9,7 @@ const UserSchema = new Schema({
   createDate: { type: Date, default: Date.now },
   gender: { type: String, enum: ["male", "female"] },
   friends: { type: [mongoose.Schema.Types.ObjectId], ref: "User" },
-  thumbNail: { type: String },
+  thumbnail: { type: String },
   coverPhoto: { type: String },
   info: { type: String },
   isOnline: { type: Boolean, default: false },

@@ -4,6 +4,7 @@ import passport from "passport";
 import User from "../models/user.js";
 import tokenForUser from "../token/jwtToken.js";
 import Room from "../models/room.js";
+import { registerValidation } from "../validation.js";
 
 const requireAuth = passport.authenticate("jwt", { session: false });
 const requireSignin = passport.authenticate("local", { session: false });
@@ -12,9 +13,8 @@ const userRouter = Router();
 
 userRouter.post("/signup", async (req, res, next) => {
   const { username, email, password, birthday, gender } = req.body;
-  if (!email || !password) {
-    return res.status(422).send({ error: "some infos are not provided" });
-  }
+  const { error } = registerValidation(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
 
   try {
     const existUser = await User.findOne({ email }).exec();
@@ -43,9 +43,12 @@ userRouter.post("/signin", requireSignin, (req, res, next) => {
 //protected routes
 userRouter.use(requireAuth);
 
-userRouter.get("/", (req, res) => {
-  req.user.isOnline = true;
-  return res.send(req.user);
+userRouter.get("/", async (req, res) => {
+  const result = await User.findByIdAndUpdate(req.user._id, { isOnline: true });
+
+  // const userToSend = { ...req.user._doc, isOnline: true };
+
+  return res.send(result);
 });
 userRouter.patch("/logout", async (req, res) => {
   const { _id } = req.body;
@@ -93,7 +96,7 @@ userRouter.patch("/friend", async (req, res) => {
       return res.status(400).send("freind already");
     }
     if (!findRoom) {
-      const newRoom = await new Room({
+      const newRoom = new Room({
         users: [user01Id, user02Id],
       });
       await newRoom.save();
