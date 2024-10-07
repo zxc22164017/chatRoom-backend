@@ -7,7 +7,7 @@ const PostSchema = new Schema({
   author: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   community: { type: mongoose.Schema.ObjectId, ref: "Community" },
   likes: { type: [mongoose.Schema.Types.ObjectId], ref: "User" },
-  comments: { type: [String], default: [] },
+  comments: { type: [mongoose.Schema.Types.ObjectId], default: [] },
   postTime: { type: Date, default: Date.now() },
   modifiedTime: { type: Date },
 });

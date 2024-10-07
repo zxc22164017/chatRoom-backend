@@ -40,9 +40,18 @@ const communityValidation = (data) => {
 
   return Schema.validate(data);
 };
+
+const commentValidation = (data) => {
+  const Schema = Joi.object({
+    content: Joi.string().required(),
+    parentComment: Joi.string(),
+  });
+  return Schema.validate(data);
+};
 export {
   registerValidation,
   roomValidation,
   postValidation,
   communityValidation,
+  commentValidation,
 };

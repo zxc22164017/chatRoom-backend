@@ -92,8 +92,15 @@ userRouter.patch("/friend", async (req, res) => {
     if (!(findUser01 && findUser02)) {
       return res.status(404).send("user id not found");
     }
-    if (findUser01.friends.includes(user02Id)) {
-      return res.status(400).send("freind already");
+    const user01Index = findUser01.friends.indexOf(user02Id);
+    const user02Index = findUser02.friends.indexOf(user01Id);
+    if (user01Index !== -1 && user02Index !== -1) {
+      findUser01.friends.splice(user01Index, 1);
+      findUser02.friends.splice(user02Index, 1);
+
+      await findUser01.save();
+      await findUser02.save();
+      return res.status(204).send();
     }
     if (!findRoom) {
       const newRoom = new Room({
@@ -106,21 +113,6 @@ userRouter.patch("/friend", async (req, res) => {
 
     await findUser01.save();
     await findUser02.save();
-    return res.status(204).send();
-  } catch (error) {
-    return res.status(500).send(error);
-  }
-});
-userRouter.delete("/friend", async (req, res) => {
-  try {
-    const { user01Id, user02Id } = req.body;
-    const result01 = await User.findByIdAndUpdate(user01Id, {
-      $pull: { friends: user02Id },
-    });
-    const result02 = await User.findByIdAndUpdate(user02Id, {
-      $pull: { friends: user01Id },
-    });
-
     return res.status(204).send();
   } catch (error) {
     return res.status(500).send(error);
