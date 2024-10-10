@@ -7,6 +7,7 @@ import User from "../models/user.js";
 import Room from "../models/room.js";
 import Post from "../models/post.js";
 import Comment from "../models/comment.js";
+import Community from "../models/community.js";
 
 const s3 = new S3Client({
   credentials: {
@@ -31,8 +32,7 @@ uploadRouter.get("/presign", async (req, res) => {
     const presignedUrl = await getSignedUrl(s3, command, { expiresIn: 60 });
     return res.status(200).send({ key, presignedUrl });
   } catch (error) {
-    console.log(error);
-    return res.status(500).send(error);
+    return res.status(500).send({ error: error });
   }
 });
 
@@ -49,39 +49,7 @@ uploadRouter.post("/user", async (req, res) => {
       return res.status(200).send(result);
     }
   } catch (error) {
-    return res.status(500).send(error);
-  }
-});
-
-uploadRouter.post("/room", async (req, res) => {
-  const { key, roomId } = req.body;
-  try {
-    const result = await Room.findByIdAndUpdate(roomId, { thumbnail: key });
-    if (!result) return res.status(404).send({ error: "not found" });
-    return res.status(200).send(result);
-  } catch (error) {
-    return res.status(500).send(error);
-  }
-});
-uploadRouter.post("/post", async (req, res) => {
-  const { key, postId } = req.body;
-  try {
-    const result = await Post.findByIdAndUpdate(postId, { image: key });
-    if (!result) return res.status(404).send({ error: "not found" });
-    return res.status(200).send(result);
-  } catch (error) {
-    return res.status(500).send(error);
-  }
-});
-uploadRouter.post("/comment", async (req, res) => {
-  const { key, commentId } = req.body;
-  try {
-    const result = await Comment.findByIdAndUpdate(commentId, { image: key });
-    if (!result) return res.status(404).send({ error: "not found" });
-    return res.status(200).send(result);
-  } catch (error) {
-    console.log(error);
-    return res.status(500).send(error);
+    return res.status(500).send({ error: error });
   }
 });
 

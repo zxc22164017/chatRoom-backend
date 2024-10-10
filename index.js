@@ -20,7 +20,13 @@ import commentRouter from "./routes/comment.js";
 passportServices(passport);
 const app = express();
 const server = createServer(app);
-const io = new Server(server, { cors: { origin: "http://localhost:5173" } });
+const io = new Server(server, {
+  connectionStateRecovery: {
+    maxDisconnectionDuration: 2 * 60 * 1000,
+    skipMiddlewares: true,
+  },
+  cors: { origin: "http://localhost:5173" },
+});
 app.use(morgan("combined"));
 app.use(cors());
 app.use(express.json());

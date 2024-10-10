@@ -13,14 +13,33 @@ postRouter.get("/", async (req, res) => {
       .limit(limit)
       .skip(page * limit)
       .lean();
+    if (result.length === 0) {
+      return res.status(404).send({ error: "no data" });
+    }
     return res.status(200).send(result);
   } catch (error) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error: error });
+  }
+});
+postRouter.get("/community", async (req, res) => {
+  const { communityId, page } = req.query;
+  try {
+    const findPosts = await Post.find({ community: communityId })
+      .populate({
+        path: "community",
+        select: "name icon ",
+      })
+      .limit(limit)
+      .skip(limit * page)
+      .lean();
+    return res.status(200).send(findPosts);
+  } catch (error) {
+    return res.status(500).send({ error: error });
   }
 });
 postRouter.get("/user", async (req, res) => {
   const { userId, page } = req.query;
-  console.log(userId);
+
   try {
     const findPosts = await Post.find({ author: userId })
       .populate({
@@ -32,7 +51,7 @@ postRouter.get("/user", async (req, res) => {
       .lean();
     return res.status(200).send(findPosts);
   } catch (error) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error: error });
   }
 });
 postRouter.get("/search", async (req, res) => {
@@ -51,7 +70,7 @@ postRouter.get("/search", async (req, res) => {
       .lean();
     return res.status(200).send(findPosts);
   } catch (error) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error: error });
   }
 });
 
@@ -62,7 +81,7 @@ postRouter.get("/:_id", async (req, res) => {
       .populate([
         {
           path: "community",
-          select: "name icon description",
+          select: "name icon description rules",
         },
         { path: "author", select: "username thumbnail" },
       ])
@@ -72,7 +91,7 @@ postRouter.get("/:_id", async (req, res) => {
     }
     return res.status(200).send(findPost);
   } catch (error) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error: error });
   }
 });
 
@@ -80,21 +99,40 @@ postRouter.post("/", async (req, res) => {
   const { error } = postValidation(req.body);
 
   if (error) return res.status(400).send(error.details[0].message);
-  const { title, content, communityId } = req.body;
+  const { title, content, communityId, image } = req.body;
   try {
     const result = await new Post({
       title,
       content,
+      image,
       community: communityId,
       author: req.user._id,
     }).save();
     return res.status(201).send(result);
   } catch (error) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error: error });
   }
 });
 
-postRouter.patch("/:_id", (req, res) => {});
+postRouter.patch("/:_id", async (req, res) => {
+  const { error } = postValidation(req.body);
+
+  if (error) return res.status(400).send(error.details[0].message);
+
+  const { _id } = req.params;
+  const { title, content, image } = req.body;
+  try {
+    const findPost = await Post.findById(_id);
+    if (!findPost) return res.status(404).send({ error: "post not found" });
+    findPost.title = title;
+    findPost.content = content;
+    findPost.image = image;
+    await findPost.save();
+    return res.status(204).send();
+  } catch (error) {
+    return res.status(500).send({ error: error });
+  }
+});
 
 postRouter.delete("/:_id", async (req, res) => {
   const { _id } = req.params;
@@ -103,7 +141,7 @@ postRouter.delete("/:_id", async (req, res) => {
     const result = await Post.findByIdAndDelete(_id);
     return res.status(200).send(result);
   } catch (error) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error: error });
   }
 });
 
@@ -123,7 +161,7 @@ postRouter.patch("/like/:_id", async (req, res) => {
     const result = await findPost.save();
     return res.status(204).send();
   } catch (error) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error: error });
   }
 });
 

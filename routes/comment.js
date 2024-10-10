@@ -15,15 +15,33 @@ commentRouter.get("/:postId", async (req, res) => {
       .limit(limit)
       .skip(limit * page)
       .lean();
+    if (page !== "0" && result.length === 0) {
+      return res.status(404).send({ error: "no more" });
+    }
     return res.status(200).send(result);
-  } catch (error) {}
+  } catch (error) {
+    return res.status(500).send({ error: error });
+  }
+});
+commentRouter.get("/comment/:commentId", async (req, res) => {
+  const { commentId } = req.params;
+
+  try {
+    const result = await Comment.findById(commentId)
+      .populate({ path: "author", select: "username thumbnail" })
+      .lean();
+    if (!result) return res.status(404).send({ error: "comment not found" });
+    return res.status(200).send(result);
+  } catch (error) {
+    return res.status(500).send({ error: error });
+  }
 });
 
 commentRouter.post("/:postId", async (req, res) => {
   const { postId } = req.params;
   const { error } = commentValidation(req.body);
   if (error) return res.status(400).send(error.details[0].message);
-  const { content } = req.body;
+  const { content, image } = req.body;
   const author = req.user;
   try {
     const findPost = await Post.findById(postId);
@@ -33,14 +51,14 @@ commentRouter.post("/:postId", async (req, res) => {
     const result = await new Comment({
       post: postId,
       content: content,
+      image: image,
       author: author._id,
     }).save();
     findPost.comments.push(result._id);
     await findPost.save();
     return res.status(200).send(result);
   } catch (error) {
-    console.log(error);
-    return res.status(500).send(error);
+    return res.status(500).send({ error: error });
   }
 });
 
@@ -61,7 +79,26 @@ commentRouter.patch("/like/:_id", async (req, res) => {
     await findComment.save();
     return res.status(204).send();
   } catch (error) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error: error });
+  }
+});
+commentRouter.patch("/:commentId", async (req, res) => {
+  const { error } = commentValidation(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+  const { content, image } = req.body;
+  const { commentId } = req.params;
+  try {
+    const findComment = await Comment.findById(commentId);
+    if (!findComment)
+      return res.status(404).send({ error: "comment not found" });
+    if (image) {
+      findComment.image = image;
+    }
+    findComment.content = content;
+    await findComment.save();
+    return res.status(204).send();
+  } catch (error) {
+    return res.status(500).send({ error: error });
   }
 });
 

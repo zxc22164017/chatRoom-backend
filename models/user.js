@@ -12,7 +12,7 @@ const UserSchema = new Schema({
   thumbnail: { type: String },
   coverPhoto: { type: String },
   info: { type: String },
-  isOnline: { type: Boolean, default: false },
+  identity: { type: String, enum: ["admin", "user"], default: "user" },
 });
 
 //save and encrypt

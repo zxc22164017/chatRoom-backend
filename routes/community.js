@@ -11,15 +11,26 @@ communityRouter.get("/", async (req, res) => {
       .lean();
     return res.status(200).send(result);
   } catch (error) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error: error });
   }
 });
 
-communityRouter.get("/:_id", async (req, res) => {});
+communityRouter.get("/:name", async (req, res) => {
+  const { name } = req.params;
+  try {
+    const findCom = await Community.findOne({ name: name })
+      .populate({ path: "managers", select: "username thumbnail" })
+      .lean();
+    if (!findCom) return res.status(404).send({ error: "community not found" });
+    return res.status(200).send(findCom);
+  } catch (error) {
+    return res.status(500).send({ error: error });
+  }
+});
 communityRouter.post("/", async (req, res) => {
   const { error } = communityValidation(req.body);
   if (error) return res.status(400).send(error.details[0].message);
-  const { name, description, rules } = req.body;
+  const { name, description, rules, icon, banner } = req.body;
   const managers = req.user._id;
   try {
     const findCom = await Community.findOne({ name });
@@ -30,10 +41,39 @@ communityRouter.post("/", async (req, res) => {
       description,
       managers,
       rules,
+      icon,
+      banner,
     }).save();
     return res.status(201).send(result);
   } catch (error) {
-    return res.status(500).send(error);
+    return res.status(500).send({ error: error });
+  }
+});
+communityRouter.patch("/:_id", async (req, res) => {
+  const { error } = communityValidation(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+  const { name, description, rules, icon, banner } = req.body;
+
+  const { _id } = req.params;
+  try {
+    const findCom = await Community.findById(_id);
+    if (!findCom) {
+      return res.status(404).send({ error: "community not found" });
+    }
+    if (icon) {
+      findCom.icon = icon;
+    }
+    if (banner) {
+      findCom.banner = banner;
+    }
+    findCom.name = name;
+    findCom.description = description;
+    findCom.rules = rules;
+    await findCom.save();
+    return res.status(204).send();
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ error: error });
   }
 });
 
