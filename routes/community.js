@@ -30,8 +30,12 @@ communityRouter.get("/:name", async (req, res) => {
 communityRouter.post("/", async (req, res) => {
   const { error } = communityValidation(req.body);
   if (error) return res.status(400).send(error.details[0].message);
-  const { name, description, rules, icon, banner } = req.body;
-  const managers = req.user._id;
+  const { name, description, rules, icon, banner, managers } = req.body;
+  if (!managers) {
+    managers = req.user._id;
+  } else {
+    managers.push(req.user._id);
+  }
   try {
     const findCom = await Community.findOne({ name });
     if (findCom)
@@ -52,7 +56,11 @@ communityRouter.post("/", async (req, res) => {
 communityRouter.patch("/:_id", async (req, res) => {
   const { error } = communityValidation(req.body);
   if (error) return res.status(400).send(error.details[0].message);
-  const { name, description, rules, icon, banner } = req.body;
+  const { name, description, rules, icon, banner, managers } = req.body;
+  if (managers.length === 0)
+    return res
+      .status(400)
+      .send({ error: "must have at least one user to be manager" });
 
   const { _id } = req.params;
   try {
@@ -69,10 +77,10 @@ communityRouter.patch("/:_id", async (req, res) => {
     findCom.name = name;
     findCom.description = description;
     findCom.rules = rules;
+    findCom.managers = managers;
     await findCom.save();
     return res.status(204).send();
   } catch (error) {
-    console.log(error);
     return res.status(500).send({ error: error });
   }
 });

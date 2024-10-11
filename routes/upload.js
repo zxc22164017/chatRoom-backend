@@ -1,13 +1,13 @@
 import { Router } from "express";
 
 import { v1 } from "uuid";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import User from "../models/user.js";
-import Room from "../models/room.js";
-import Post from "../models/post.js";
-import Comment from "../models/comment.js";
-import Community from "../models/community.js";
 
 const s3 = new S3Client({
   credentials: {
@@ -36,21 +36,19 @@ uploadRouter.get("/presign", async (req, res) => {
   }
 });
 
-uploadRouter.post("/user", async (req, res) => {
-  const { key, type } = req.body;
-  const userId = req.user._id;
+export async function deleteImage(key) {
+  const s3Param = {
+    Bucket: process.env.S3_BUCKET,
+    Key: key,
+  };
+  const command = new DeleteObjectCommand(s3Param);
   try {
-    if (type === "thumbnail") {
-      const result = await User.findByIdAndUpdate(userId, { thumbnail: key });
-      return res.status(200).send(result);
-    } else if (type === "coverPhoto") {
-      const result = await User.findByIdAndUpdate(userId, { coverPhoto: key });
-      if (!result) return res.status(404).send({ error: "not found" });
-      return res.status(200).send(result);
-    }
+    const result = await s3.send(command);
+
+    return result;
   } catch (error) {
-    return res.status(500).send({ error: error });
+    return error;
   }
-});
+}
 
 export default uploadRouter;

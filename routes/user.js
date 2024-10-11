@@ -50,7 +50,7 @@ userRouter.get("/", async (req, res) => {
 
   // const userToSend = { ...req.user._doc, isOnline: true };
 
-  return res.send(result);
+  return res.status(201).send(result);
 });
 userRouter.patch("/logout", async (req, res) => {
   const { _id } = req.body;

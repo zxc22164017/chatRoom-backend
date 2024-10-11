@@ -1,6 +1,7 @@
 import { Router } from "express";
 import Post from "../models/post.js";
 import { postValidation } from "../validation.js";
+import Comment from "../models/comment.js";
 
 const postRouter = Router();
 const limit = 5;
@@ -160,6 +161,16 @@ postRouter.patch("/like/:_id", async (req, res) => {
     findPost.likes.push(user._id);
     const result = await findPost.save();
     return res.status(204).send();
+  } catch (error) {
+    return res.status(500).send({ error: error });
+  }
+});
+postRouter.delete("/", async (req, res) => {
+  const { post } = req.body;
+  try {
+    const result = await Post.findOneAndDelete({ _id: post._id });
+
+    return res.status(200).send();
   } catch (error) {
     return res.status(500).send({ error: error });
   }

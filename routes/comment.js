@@ -2,6 +2,7 @@ import { Router } from "express";
 import { commentValidation } from "../validation.js";
 import Comment from "../models/comment.js";
 import Post from "../models/post.js";
+import { deleteImage } from "./upload.js";
 
 const commentRouter = Router();
 
@@ -98,6 +99,22 @@ commentRouter.patch("/:commentId", async (req, res) => {
     await findComment.save();
     return res.status(204).send();
   } catch (error) {
+    return res.status(500).send({ error: error });
+  }
+});
+commentRouter.delete("/", async (req, res) => {
+  const { comment } = req.body;
+  try {
+    const findPost = await Post.findById(comment.post);
+    const index = findPost.comments.indexOf(comment._id);
+    findPost.comments.splice(index, 1);
+    await findPost.save();
+
+    const result = await Comment.findOneAndDelete({ _id: comment._id });
+
+    return res.status(204).send();
+  } catch (error) {
+    console.log(error);
     return res.status(500).send({ error: error });
   }
 });

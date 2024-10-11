@@ -13,7 +13,7 @@ const registerValidation = (data) => {
         "any.required": `Password is required`,
       }),
     birthday: Joi.date().max("12-31-2011").min("1-1-1900").required(),
-    gebder: Joi.string().required().valid("male", "female"),
+    gender: Joi.string().required().valid("male", "female"),
     info: Joi.string(),
   });
   return Schema.validate(data);
@@ -24,15 +24,13 @@ const patchValidation = (data) => {
     email: Joi.string().required().email(),
     password: Joi.string().required(),
     patchPassword: Joi.string()
-      .pattern(new RegExp("^[a-zA-Z0-9]{8,25}$"))
-      .messages({
-        "string.pattern.base": `Password should be between 8 to 25 characters and contain letters or numbers only`,
-        "string.empty": `Password cannot be empty`,
-        "any.required": `Password is required`,
-      }),
+      .allow(null, "")
+      .pattern(new RegExp("^[a-zA-Z0-9]{8,25}$")),
     birthday: Joi.date().max("12-31-2011").min("1-1-1900").required(),
-    gebder: Joi.string().required().valid("male", "female"),
+    gender: Joi.string().required().valid("male", "female"),
     info: Joi.string(),
+    thumbnail: Joi.string().allow(null, ""),
+    coverPhoto: Joi.string().allow(null, ""),
   });
   return Schema.validate(data);
 };
@@ -62,6 +60,7 @@ const communityValidation = (data) => {
     rules: Joi.array(),
     icon: Joi.string(),
     banner: Joi.string(),
+    managers: Joi.array(),
   });
 
   return Schema.validate(data);
