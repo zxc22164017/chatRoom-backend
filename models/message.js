@@ -7,4 +7,5 @@ const MessageSchema = new Schema({
   createTime: { type: Date, default: Date.now },
   readed: { type: Boolean, default: false },
 });
+
 export default mongoose.model("Message", MessageSchema);

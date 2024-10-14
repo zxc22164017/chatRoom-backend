@@ -11,6 +11,7 @@ postRouter.get("/", async (req, res) => {
   try {
     const result = await Post.find()
       .populate({ path: "community", select: "name icon" })
+      .sort({ likes: -1, commentsL: -1, _id: -1 })
       .limit(limit)
       .skip(page * limit)
       .lean();
@@ -69,6 +70,10 @@ postRouter.get("/search", async (req, res) => {
       .limit(limit)
       .skip(limit * page)
       .lean();
+    console.log(findPosts);
+    if (findPosts.length === 0) {
+      return res.status(404).send({ error: "no data found" });
+    }
     return res.status(200).send(findPosts);
   } catch (error) {
     return res.status(500).send({ error: error });
@@ -130,17 +135,6 @@ postRouter.patch("/:_id", async (req, res) => {
     findPost.image = image;
     await findPost.save();
     return res.status(204).send();
-  } catch (error) {
-    return res.status(500).send({ error: error });
-  }
-});
-
-postRouter.delete("/:_id", async (req, res) => {
-  const { _id } = req.params;
-
-  try {
-    const result = await Post.findByIdAndDelete(_id);
-    return res.status(200).send(result);
   } catch (error) {
     return res.status(500).send({ error: error });
   }

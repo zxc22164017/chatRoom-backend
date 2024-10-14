@@ -18,6 +18,20 @@ const registerValidation = (data) => {
   });
   return Schema.validate(data);
 };
+const forgetPasswordValidation = (data) => {
+  const Schema = Joi.object({
+    email: Joi.string().required().email(),
+    password: Joi.string()
+      .required()
+      .pattern(new RegExp("^[a-zA-Z0-9]{8,25}$"))
+      .messages({
+        "string.pattern.base": `Password should be between 8 to 25 characters and contain letters or numbers only`,
+        "string.empty": `Password cannot be empty`,
+        "any.required": `Password is required`,
+      }),
+  });
+  return Schema.validate(data);
+};
 const patchValidation = (data) => {
   const Schema = Joi.object({
     username: Joi.string().max(25).required().alphanum(),
@@ -81,4 +95,5 @@ export {
   communityValidation,
   commentValidation,
   patchValidation,
+  forgetPasswordValidation,
 };

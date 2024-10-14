@@ -4,7 +4,11 @@ import passport from "passport";
 import User from "../models/user.js";
 import tokenForUser from "../token/jwtToken.js";
 import Room from "../models/room.js";
-import { registerValidation, patchValidation } from "../validation.js";
+import {
+  registerValidation,
+  patchValidation,
+  forgetPasswordValidation,
+} from "../validation.js";
 
 const requireAuth = passport.authenticate("jwt", { session: false });
 const requireSignin = passport.authenticate("local", { session: false });
@@ -39,8 +43,24 @@ userRouter.post("/signup", async (req, res, next) => {
   }
 });
 
-userRouter.post("/signin", requireSignin, (req, res, next) => {
+userRouter.post("/signin", requireSignin, (req, res) => {
   return res.send({ token: tokenForUser(req.user) });
+});
+userRouter.patch("/forget", async (req, res) => {
+  const { error } = forgetPasswordValidation(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+  const { email, password } = req.body;
+  try {
+    const findUser = await User.findOne({ email: email });
+    if (!findUser) {
+      return res.status(404).send({ error: "wrong email" });
+    }
+    findUser.password = password;
+    await findUser.save();
+    return res.status(204).send();
+  } catch (error) {
+    return res.status(500).send({ error: error });
+  }
 });
 //protected routes
 userRouter.use(requireAuth);

@@ -9,7 +9,7 @@ const CommentSchema = new Schema({
   parentComment: { type: mongoose.Schema.Types.ObjectId, ref: "Comment" },
   replies: { type: [mongoose.Schema.Types.ObjectId], ref: "Comment" },
   likes: { type: [mongoose.Schema.Types.ObjectId], ref: "User" },
-  postTime: { type: Date, default: Date.now() },
+  postTime: { type: Date, default: Date.now },
 });
 
 CommentSchema.pre("findOneAndDelete", async function (next) {
