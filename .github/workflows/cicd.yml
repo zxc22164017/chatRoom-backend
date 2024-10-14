@@ -27,7 +27,7 @@ jobs:
       - name: Delete old container
         run: docker rm -f nodejs-app-container
       - name: Run Docker Container
-        run: docker run -d -p 8080:8080 --name nodejs-app-container  zxc22164017/nodejs-app -e MONGODB_URL='${{secrets.MONGODB_URL}}'
+        run: docker run -d -p 8080:8080 --name nodejs-app-container -e MONGODB_URL='${{secrets.MONGODB_URL}}' zxc22164017/nodejs-app
         env:
           MONGODB_URL: "${{secrets.MONGODB_URL}}"
           SECRET: "${{secrets.SECRET}}"
