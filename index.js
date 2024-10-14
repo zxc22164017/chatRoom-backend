@@ -31,14 +31,8 @@ app.use(morgan("combined"));
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-app.get("/", (req, res) => {
-  res.status(200).send("hello");
-});
-
 app.use("/user", userRouter);
 app.use(requireAuth);
-
 app.use("/room", roomRouter);
 app.use("/chat", messageRouter);
 app.use("/upload", uploadRouter);
