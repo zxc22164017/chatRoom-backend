@@ -27,10 +27,4 @@ jobs:
       - name: Delete old container
         run: docker rm -f nodejs-app-container
       - name: Run Docker Container
-        run: docker run -d -p 8080:8080 --name nodejs-app-container -e MONGODB_URL='${{secrets.MONGODB_URL}}' zxc22164017/nodejs-app
-        env:
-          MONGODB_URL: "${{secrets.MONGODB_URL}}"
-          SECRET: "${{secrets.SECRET}}"
-          ACCESS_KEY_ID: ${{secrets.ACCESS_KEY_ID}}
-          SECRET_ACCESS_KEY: "${{secrets.SECRET_ACCESS_KEY}}"
-          S3_BUCKET: ${{secrets.S3_BUCKET}}
+        run: docker run -d -p 8080:8080 --name nodejs-app-container -e MONGODB_URL='${{secrets.MONGODB_URL}}' -e SECRET= '${{secrets.SECRET}}' -e ACCESS_KEY_ID= '${{secrets.ACCESS_KEY_ID}}' -e SECRET_ACCESS_KEY= '${{secrets.SECRET_ACCESS_KEY}}' -e S3_BUCKET= '${{secrets.S3_BUCKET}}'  zxc22164017/nodejs-app
