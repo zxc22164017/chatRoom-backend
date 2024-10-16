@@ -25,7 +25,7 @@ const io = new Server(server, {
     maxDisconnectionDuration: 2 * 60 * 1000,
     skipMiddlewares: true,
   },
-  cors: { origin: "http://52.195.177.191:5173" },
+  cors: { origin: "http://52.195.177.191" },
 });
 app.use(morgan("combined"));
 app.use(cors());
