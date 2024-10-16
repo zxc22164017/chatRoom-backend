@@ -11,7 +11,7 @@ postRouter.get("/", async (req, res) => {
   try {
     const result = await Post.find()
       .populate({ path: "community", select: "name icon" })
-      .sort({ likes: -1, commentsL: -1, _id: -1 })
+      .sort({ _id: -1, likes: -1, commentsL: -1 })
       .limit(limit)
       .skip(page * limit)
       .lean();
