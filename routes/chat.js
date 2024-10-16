@@ -4,7 +4,7 @@ import Message from "../models/message.js";
 const messageRouter = Router();
 
 messageRouter.get("/:_id", async (req, res) => {
-  const limit = 10;
+  const limit = 15;
   const roomId = req.params._id;
   const { page } = req.query;
 
