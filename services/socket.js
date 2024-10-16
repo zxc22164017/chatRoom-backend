@@ -18,6 +18,7 @@ export default function socket(io) {
 
   io.on("connection", async (socket) => {
     const username = socket.request.user.username;
+    socket.join(socket.request.user._id.toString());
     console.log(`${username} is online`);
     socket.broadcast.emit("online", `${username} is online`);
     socket.on("join-room", async (roomId) => {
@@ -61,6 +62,19 @@ export default function socket(io) {
         if (!updatedRoom) {
           callback({ status: 400, message: "room doesn't exist" });
         } else {
+          const usersId = updatedRoom.users;
+          const notification =
+            updatedRoom.name === undefined
+              ? `${username} just send a message`
+              : `${username} just sent a message to ${updatedRoom.name}`;
+          usersId.forEach((userId) => {
+            if (userId !== socket.request.user._id) {
+              socket.to(userId.toString()).emit("notification", {
+                notification,
+                roomId: updatedRoom._id,
+              });
+            }
+          });
           socket.to(roomId).emit("recieveMessage", newMessage);
           callback({ status: 200, newMessage });
         }
