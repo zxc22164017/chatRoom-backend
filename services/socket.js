@@ -65,7 +65,7 @@ export default function socket(io) {
           const usersId = updatedRoom.users;
           const notification =
             updatedRoom.name === undefined
-              ? `${username} just send a message`
+              ? `${username} just sent a message`
               : `${username} just sent a message to ${updatedRoom.name}`;
           usersId.forEach((userId) => {
             if (userId !== socket.request.user._id) {
