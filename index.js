@@ -25,7 +25,11 @@ const io = new Server(server, {
     maxDisconnectionDuration: 2 * 60 * 1000,
     skipMiddlewares: true,
   },
-  cors: { origin: "http://52.195.177.191" },
+  cors: {
+    origin:
+      "http://52.195.177.191" &&
+      "http://ec2-52-195-177-191.ap-northeast-1.compute.amazonaws.com/",
+  },
 });
 app.use(morgan("combined"));
 app.use(cors());
