@@ -72,6 +72,7 @@ export default function socket(io) {
               socket.to(userId.toString()).emit("notification", {
                 notification,
                 roomId: updatedRoom._id,
+                time: new Date.now(),
               });
             }
           });
