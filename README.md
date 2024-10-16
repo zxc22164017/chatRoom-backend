@@ -29,10 +29,8 @@ Deployed on [AWS EC2](https://aws.amazon.com/tw/ec2/)
 - [Passportjs](https://www.passportjs.org/)-Middleware for authentication
 - [Bcrypt](https://www.npmjs.com/package/bcrypt)-Library for hashing data
 - [JSON web token](https://jwt.io/)-a standard method for representing claims securely between two parties
-- [AWS S3](https://aws.amazon.com/tw/s3/)-cloud platform to store images
-
 - [Mongoose](https://mongoosejs.com/)-nodejs ODM
-- [Redis](https://redis.io/)-nonSQL database for caching data
+
 
 ### Database
 
@@ -44,6 +42,8 @@ Deployed on [AWS EC2](https://aws.amazon.com/tw/ec2/)
 - [Docker](https://www.docker.com/)-image container
 - [CICD](https://github.com/resources/articles/devops/ci-cd)-automatic deployment
 - [nginx](https://nginx.org/)-proxy reverse
+- [AWS S3](https://aws.amazon.com/tw/s3/)-AWS platform to store images
+- [ElastiCache](https://aws.amazon.com/tw/elasticache/)-AWS platform to host Redis
 
 # Key features
 
