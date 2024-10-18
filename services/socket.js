@@ -30,7 +30,8 @@ export default function socket(io) {
           socket.join(roomId);
           console.log("join ", roomId);
           for (const room of socket.rooms) {
-            if (room !== roomId) socket.leave(room);
+            if (room !== roomId || room === socket.request.user._id.toString())
+              socket.leave(room);
           }
           socket.emit(
             "join-room",
