@@ -41,6 +41,10 @@ export default function socket(io) {
         socket.emit("join-room", { message: "error", error: error });
       }
     });
+    socket.on("leave-room", () => {
+      console.log("leave");
+      socket.join(socket.request.user._id.toString());
+    });
     socket.on("sendMessage", async (roomId, message, callback) => {
       try {
         const sender = socket.request.user._id;
