@@ -31,6 +31,7 @@ postRouter.get("/community", async (req, res) => {
         path: "community",
         select: "name icon ",
       })
+      .sort({ _id: -1, likes: -1, commentsL: -1 })
       .limit(limit)
       .skip(limit * page)
       .lean();
@@ -48,6 +49,7 @@ postRouter.get("/user", async (req, res) => {
         path: "community",
         select: "name icon ",
       })
+      .sort({ _id: -1 })
       .limit(limit)
       .skip(limit * page)
       .lean();
@@ -60,17 +62,18 @@ postRouter.get("/search", async (req, res) => {
   const { search, page } = req.query;
   try {
     const findPosts = await Post.find({
-      title: { $regex: search, $options: "i" },
-      content: { $regex: search, $options: "i" },
+      title: { $regex: `${search}`, $options: "i" },
+      content: { $regex: `${search}`, $options: "i" },
     })
       .populate({
         path: "community",
         select: "name icon ",
       })
+      .sort({ _id: -1, likes: -1, commentsL: -1 })
       .limit(limit)
       .skip(limit * page)
       .lean();
-    console.log(findPosts);
+
     if (findPosts.length === 0) {
       return res.status(404).send({ error: "no data found" });
     }

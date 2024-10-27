@@ -14,6 +14,7 @@ const requireAuth = passport.authenticate("jwt", { session: false });
 const requireSignin = passport.authenticate("local", { session: false });
 passportServices(passport);
 const userRouter = Router();
+const limit = 5;
 
 userRouter.post("/signup", async (req, res, next) => {
   const { username, email, password, birthday, gender, thumbnail, coverPhoto } =
@@ -79,12 +80,14 @@ userRouter.patch("/logout", async (req, res) => {
 });
 
 userRouter.get("/search", async (req, res) => {
-  const search = req.query.search;
+  const { search, page } = req.query;
   try {
     const findUsers = await User.find({
       username: { $regex: search, $options: "i" },
     })
       .select("-password -email -birthday -gender -rooms ")
+      .limit(limit)
+      .skip(limit * page)
       .lean();
 
     return res.status(200).send(findUsers);
