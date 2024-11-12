@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import redis from "redis";
 
 const redisUrl =
-  "redis://clustercfg.forpersonalproject.fbxs9e.apne1.cache.amazonaws.com:6379"; //change when publication
+  "redis://forpersonalproject.fbxs9e.ng.0001.apne1.cache.amazonaws.com:6379"; //change when publication
 const client = redis.createClient(redisUrl);
 
 client
