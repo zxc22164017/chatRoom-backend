@@ -10,7 +10,8 @@ client
   .then(() => {
     console.log("connect to redis");
   })
-  .catch(() => {
+  .catch((e) => {
+    console.log(e);
     console.log("redis unable to connect");
   });
 const exec = mongoose.Query.prototype.exec;
