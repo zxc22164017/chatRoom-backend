@@ -14,6 +14,7 @@ messageRouter.get("/:_id", async (req, res) => {
       .skip(page * limit)
       .populate({ path: "sender", select: "username thumbnail" })
       .sort({ _id: -1 })
+      .cache({ key: roomId })
       .lean();
     if (findResults.length === 0 && page !== "0") {
       return res.status(404).send({ error: "no more data" });

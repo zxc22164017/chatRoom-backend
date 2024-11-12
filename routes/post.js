@@ -2,6 +2,7 @@ import { Router } from "express";
 import Post from "../models/post.js";
 import { postValidation } from "../validation.js";
 import Comment from "../models/comment.js";
+import { cleanHashMiddleware } from "../middelware/cleanCache.js";
 
 const postRouter = Router();
 const limit = 5;
@@ -14,6 +15,7 @@ postRouter.get("/", async (req, res) => {
       .sort({ _id: -1, likes: -1, commentsL: -1 })
       .limit(limit)
       .skip(page * limit)
+      .cache()
       .lean();
     if (result.length === 0) {
       return res.status(404).send({ error: "no data" });
@@ -34,6 +36,7 @@ postRouter.get("/community", async (req, res) => {
       .sort({ _id: -1, likes: -1, commentsL: -1 })
       .limit(limit)
       .skip(limit * page)
+      .cache()
       .lean();
     return res.status(200).send(findPosts);
   } catch (error) {
@@ -103,7 +106,7 @@ postRouter.get("/:_id", async (req, res) => {
     return res.status(500).send({ error: error });
   }
 });
-
+postRouter.use(cleanHashMiddleware());
 postRouter.post("/", async (req, res) => {
   const { error } = postValidation(req.body);
 

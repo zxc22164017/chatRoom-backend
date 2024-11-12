@@ -1,6 +1,7 @@
 import { Router } from "express";
 import Community from "../models/community.js";
 import { communityValidation } from "../validation.js";
+import { cleanHashMiddleware } from "../middelware/cleanCache.js";
 
 const communityRouter = Router();
 
@@ -8,6 +9,7 @@ communityRouter.get("/", async (req, res) => {
   try {
     const result = await Community.find()
       .select("-banner -description -managers ")
+      .cache()
       .lean();
     return res.status(200).send(result);
   } catch (error) {
@@ -27,6 +29,7 @@ communityRouter.get("/:name", async (req, res) => {
     return res.status(500).send({ error: error });
   }
 });
+communityRouter.use(cleanHashMiddleware());
 communityRouter.post("/", async (req, res) => {
   const { error } = communityValidation(req.body);
   if (error) return res.status(400).send(error.details[0].message);

@@ -1,9 +1,10 @@
 import { Router } from "express";
 import Room from "../models/room.js";
 import { roomValidation } from "../validation.js";
+import { cleanHashMiddleware } from "../middelware/cleanCache.js";
 
 const roomRouter = Router();
-
+const TYPE = "room";
 roomRouter.get("/", async (req, res) => {
   const { userId, page } = req.query;
 
@@ -16,6 +17,7 @@ roomRouter.get("/", async (req, res) => {
       ])
       .limit(limit)
       .skip(limit * page)
+      .cache({ key: userId })
       .lean();
     if (page !== "0" && findRooms.length === 0) {
       return res.status(404).send({ error: "no more" });
@@ -36,7 +38,7 @@ roomRouter.get("/:_id", async (req, res) => {
     return res.status(500).send({ error: error });
   }
 });
-
+roomRouter.use(cleanHashMiddleware(TYPE));
 roomRouter.post("/", async (req, res) => {
   const { error } = roomValidation(req.body);
   if (error) return res.status(400).send(error.details[0].message);

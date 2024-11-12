@@ -16,6 +16,7 @@ import uploadRouter from "./routes/upload.js";
 import communityRouter from "./routes/community.js";
 import postRouter from "./routes/post.js";
 import commentRouter from "./routes/comment.js";
+import "./services/cache.js";
 
 passportServices(passport);
 const app = express();

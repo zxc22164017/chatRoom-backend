@@ -3,6 +3,7 @@ import Message from "../models/message.js";
 import passport from "passport";
 import passportServices from "./passport.js";
 import User from "../models/user.js";
+import { notificationCache } from "./cache.js";
 
 export default function socket(io) {
   const requireAuth = passport.authenticate("jwt", { session: false });
@@ -18,8 +19,15 @@ export default function socket(io) {
 
   io.on("connection", async (socket) => {
     const username = socket.request.user.username;
-    socket.join(socket.request.user._id.toString());
+    const currentUserId = socket.request.user._id.toString();
+    socket.join(currentUserId);
     console.log(`${username} is online`);
+    const cacheData = await notificationCache("get", currentUserId);
+
+    if (cacheData.length !== 0) {
+      socket.emit("notification", cacheData);
+    }
+
     socket.broadcast.emit("online", `${username} is online`);
     socket.on("join-room", async (roomId) => {
       try {
@@ -73,10 +81,13 @@ export default function socket(io) {
               : `${username} just sent a message to ${updatedRoom.name}`;
           usersId.forEach((userId) => {
             if (userId !== socket.request.user._id) {
-              socket.to(userId.toString()).emit("notification", {
+              const data = {
                 notification,
                 roomId: updatedRoom._id,
-              });
+              };
+              notificationCache("put", userId, data);
+
+              socket.to(userId.toString()).emit("notification", data);
             }
           });
           socket.to(roomId).emit("recieveMessage", newMessage);
