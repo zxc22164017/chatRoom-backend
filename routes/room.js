@@ -17,7 +17,6 @@ roomRouter.get("/", async (req, res) => {
       ])
       .limit(limit)
       .skip(limit * page)
-      .cache({ key: userId })
       .lean();
     if (page !== "0" && findRooms.length === 0) {
       return res.status(404).send({ error: "no more" });
