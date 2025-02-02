@@ -1,10 +1,13 @@
 import mongoose from "mongoose";
 import redis from "redis";
 
-const redisUrl =
-  "redis://forpersonalproject.fbxs9e.ng.0001.apne1.cache.amazonaws.com:6379"; //change when publication
 const client = redis.createClient({
-  url: redisUrl,
+  username: "default",
+  password: process.env.REDIS_PASSWORD,
+  socket: {
+    host: "redis-11222.c294.ap-northeast-1-2.ec2.redns.redis-cloud.com",
+    port: 11222,
+  },
 });
 
 client
