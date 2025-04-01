@@ -10,15 +10,13 @@ const client = redis.createClient({
   },
 });
 
-client
-  .connect()
-  .then(() => {
-    console.log("connect to redis");
-  })
-  .catch((e) => {
-    console.log(e);
-    console.log("redis unable to connect");
-  });
+try {
+  await client.connect();
+  console.log("connect to redis");
+} catch (error) {
+  console.log(error);
+}
+
 const exec = mongoose.Query.prototype.exec;
 
 mongoose.Query.prototype.cache = function (options = {}) {
@@ -28,7 +26,7 @@ mongoose.Query.prototype.cache = function (options = {}) {
 };
 
 mongoose.Query.prototype.exec = async function () {
-  if (!this.useCache) {
+  if (!this.useCache || !client.isOpen) {
     return exec.apply(this, arguments);
   }
 
