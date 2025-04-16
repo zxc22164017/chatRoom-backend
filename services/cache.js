@@ -26,7 +26,7 @@ mongoose.Query.prototype.cache = function (options = {}) {
 };
 
 mongoose.Query.prototype.exec = async function () {
-  if (!this.useCache || !client.isOpen) {
+  if (!this.useCache || !client.isReady) {
     return exec.apply(this, arguments);
   }
 
